@@ -435,7 +435,7 @@ Expected result:
 
 
 ## Project Structure
-- `docs/TRD.md` - technical requirements/design document.
+- `TRD.md` - technical requirements/design document.
 - `src/` - application code.
 - `test/` - unit + integration tests and mock HCM server.
 

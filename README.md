@@ -432,19 +432,7 @@ curl -i http://localhost:3000/balances/emp-1/loc-1
 Expected result:
 - HTTP `401 Unauthorized`.
 
-## Submission Packaging
-Create the final zip from the project root. Do not include `node_modules`, generated coverage, build output, local SQLite databases, or git metadata.
 
-```bash
-zip -r submission.zip . \
-  -x "submission.zip" "node_modules/*" "coverage/*" "dist/*" ".git/*" ".codex" "*.sqlite" "*.sqlite-journal" "*.db"
-```
-
-Verify the file is under 50 MB:
-
-```bash
-ls -lh submission.zip
-```
 
 ## Project Structure
 - `docs/TRD.md` - technical requirements/design document.

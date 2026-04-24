@@ -121,7 +121,7 @@ Run coverage:
 npm run test:cov
 ```
 
-Expected current result: 45 tests passing across 5 suites, with coverage above 95% statements and lines. The test suite includes an in-process mock HCM to simulate realtime validation, invalid dimensions, insufficient balances, and reconciliation responses.
+Expected current result: 54 tests passing across 5 suites, with approximately 98% statements/lines, 100% functions, and 84%+ branches. The test suite includes an in-process mock HCM to simulate realtime validation, invalid dimensions, insufficient balances, and reconciliation responses.
 
 Do not run `npm test` and `npm run test:cov` at the same time against the same SQLite file. Run them sequentially to avoid SQLite database lock contention.
 

@@ -4,6 +4,7 @@ const common_1 = require("@nestjs/common");
 const testing_1 = require("@nestjs/testing");
 const typeorm_1 = require("typeorm");
 const app_module_1 = require("../src/app.module");
+const time_off_balance_entity_1 = require("../src/balances/time-off-balance.entity");
 const balances_service_1 = require("../src/balances/balances.service");
 const hcm_sync_service_1 = require("../src/hcm-sync/hcm-sync.service");
 const time_off_requests_service_1 = require("../src/time-off-requests/time-off-requests.service");
@@ -157,6 +158,9 @@ describe("Time-Off Microservice (integration)", () => {
         ]);
         const emp2 = await balancesService.findOne("emp-2", "loc-2");
         expect(emp2.availableDays).toBe(12);
+    });
+    it("throws when reading a missing balance", async () => {
+        await expect(balancesService.findOne("missing-emp", "missing-loc")).rejects.toThrow("Balance not found for employee/location.");
     });
     it("handles empty batch payload", async () => {
         const result = await hcmSyncService.batchReconcile([]);
@@ -441,5 +445,44 @@ describe("Time-Off Microservice (integration)", () => {
             endDate: "2026-07-01"
         });
         await expect(requestsService.cancel(created.id)).rejects.toThrow("Only APPROVED requests can be canceled.");
+    });
+    it("throws when rejecting but the balance row is missing", async () => {
+        await balancesService.upsertOne({
+            employeeId: "emp-1",
+            locationId: "loc-1",
+            availableDays: 10
+        });
+        const created = await requestsService.create({
+            employeeId: "emp-1",
+            locationId: "loc-1",
+            requestedDays: 1,
+            startDate: "2026-07-10",
+            endDate: "2026-07-10"
+        });
+        await dataSource.getRepository(time_off_balance_entity_1.TimeOffBalance).delete({
+            employeeId: "emp-1",
+            locationId: "loc-1"
+        });
+        await expect(requestsService.reject(created.id)).rejects.toThrow("Balance missing during rejection.");
+    });
+    it("throws when canceling but the balance row is missing", async () => {
+        await balancesService.upsertOne({
+            employeeId: "emp-1",
+            locationId: "loc-1",
+            availableDays: 10
+        });
+        const created = await requestsService.create({
+            employeeId: "emp-1",
+            locationId: "loc-1",
+            requestedDays: 1,
+            startDate: "2026-07-20",
+            endDate: "2026-07-20"
+        });
+        await requestsService.approve(created.id);
+        await dataSource.getRepository(time_off_balance_entity_1.TimeOffBalance).delete({
+            employeeId: "emp-1",
+            locationId: "loc-1"
+        });
+        await expect(requestsService.cancel(created.id)).rejects.toThrow("Balance missing during cancellation.");
     });
 });

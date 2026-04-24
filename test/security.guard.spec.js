@@ -49,8 +49,34 @@ describe("SecurityGuard", () => {
         });
         expect(() => guard.canActivate(context)).toThrow(common_1.ForbiddenException);
     });
+    it("rejects when api key is not configured", () => {
+        const guard = createGuard([roles_decorator_1.Role.EMPLOYEE], null);
+        const context = createContext({
+            "x-api-key": "secret",
+            "x-user-role": roles_decorator_1.Role.EMPLOYEE
+        });
+        expect(() => guard.canActivate(context)).toThrow("API key is not configured.");
+    });
+    it("rejects valid api key when role header is missing", () => {
+        const guard = createGuard([roles_decorator_1.Role.MANAGER]);
+        const context = createContext({ "x-api-key": "secret" });
+        expect(() => guard.canActivate(context)).toThrow(common_1.ForbiddenException);
+    });
+    it("supports array-valued headers by reading the first value", () => {
+        const guard = createGuard([roles_decorator_1.Role.SYSTEM]);
+        const context = createContext({
+            "x-api-key": ["secret", "ignored"],
+            "x-user-role": [roles_decorator_1.Role.SYSTEM, roles_decorator_1.Role.EMPLOYEE]
+        });
+        expect(guard.canActivate(context)).toBe(true);
+    });
     it("allows valid api key when route has no role metadata", () => {
         const guard = createGuard([]);
+        const context = createContext({ "x-api-key": "secret" });
+        expect(guard.canActivate(context)).toBe(true);
+    });
+    it("allows valid api key when role metadata is undefined", () => {
+        const guard = createGuard(undefined);
         const context = createContext({ "x-api-key": "secret" });
         expect(guard.canActivate(context)).toBe(true);
     });

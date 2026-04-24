@@ -63,6 +63,18 @@ describe("HcmClient", () => {
             requestId: "r1"
         })).rejects.toThrow("blocked");
     });
+    it("uses default rejection reason when HCM accepts=false without reason", async () => {
+        const client = createClient("http://hcm.test");
+        jest.spyOn(global, "fetch").mockResolvedValue(new Response(JSON.stringify({ accepted: false }), {
+            status: 200
+        }));
+        await expect(client.validateAndDeduct({
+            employeeId: "e1",
+            locationId: "l1",
+            days: 1,
+            requestId: "r1"
+        })).rejects.toThrow("HCM rejected the request.");
+    });
     it("returns null reference id when HCM response has no reference", async () => {
         const client = createClient("http://hcm.test");
         jest.spyOn(global, "fetch").mockResolvedValue(new Response(JSON.stringify({ accepted: true }), { status: 200 }));
@@ -73,6 +85,11 @@ describe("HcmClient", () => {
             requestId: "r1"
         });
         expect(result.referenceId).toBeNull();
+    });
+    it("completes release when HCM returns success", async () => {
+        const client = createClient("http://hcm.test");
+        jest.spyOn(global, "fetch").mockResolvedValue(new Response("{}", { status: 200 }));
+        await expect(client.release("e1", "l1", 1, "r1")).resolves.toBeUndefined();
     });
     it("throws when release fails", async () => {
         const client = createClient("http://hcm.test");

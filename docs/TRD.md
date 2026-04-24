@@ -367,8 +367,8 @@ npm run build
 ```
 
 Current expected result:
-- 45 tests passing across 5 suites.
-- Coverage remains above 95% statements and lines for the JavaScript implementation.
+- 54 tests passing across 5 suites.
+- Coverage is approximately 98% statements/lines, 100% functions, and 84%+ branches across executable business logic.
 
 Manual run requirements:
 - `API_KEY` must be set.

@@ -21,11 +21,21 @@ The application source and tests are implemented as JavaScript (`.js`) files.
 - API key + role guard for sensitive endpoints.
 
 ## Setup
+Prerequisites:
+- Node.js and npm installed.
+- No global NestJS CLI installation is required.
+- `npm install` installs all project dependencies locally from `package.json`, including NestJS, TypeORM, SQLite, Jest, and Supertest.
+
+Install dependencies after cloning/downloading the project:
+
 ```bash
 npm install
 ```
 
-Set environment variables (example):
+If you move the project to a new PC, run `npm install` again in the project root. Do not copy `node_modules`; it is generated locally.
+
+Set environment variables before starting the API:
+
 ```bash
 export HCM_BASE_URL=http://localhost:4001
 export DB_PATH=timeoff.sqlite
@@ -33,7 +43,8 @@ export API_KEY=dev-secret
 export HCM_TIMEOUT_MS=3000
 ```
 
-Run locally:
+Run locally after setting the environment variables:
+
 ```bash
 npm run start:dev
 ```
@@ -47,14 +58,16 @@ npm start
 The API starts on `http://localhost:3000`.
 
 Recommended local startup order:
-1. Start the mock HCM in terminal 1.
-2. Start this NestJS service in terminal 2.
-3. Run the curl commands from terminal 3.
+1. Terminal 1: start the mock HCM.
+2. Terminal 2: start this NestJS service.
+3. Terminal 3: run the curl API tests.
 
-## Local Mock HCM
-Request creation calls the configured HCM service. For local manual testing, run this mock HCM in a second terminal:
+## Terminal 1: Start Local Mock HCM
+Request creation calls the configured HCM service. For local manual testing, keep this mock HCM running in terminal 1:
 
 ```bash
+cd "/path/to/time-off-microservice"
+
 node -e '
 const http=require("http");
 let b={"emp-1::loc-1":10,"emp-2::loc-2":1};
@@ -68,6 +81,34 @@ let d=""; req.on("data",c=>d+=c); req.on("end",()=>{
 });}).listen(4001,()=>console.log("Mock HCM on :4001"));
 '
 ```
+
+Expected terminal output:
+```text
+Mock HCM on :4001
+```
+
+Leave this terminal open while testing. It simulates the external HCM APIs used by the service.
+
+## Terminal 2: Start the NestJS API
+Open a second terminal and run:
+
+```bash
+cd "/path/to/time-off-microservice"
+
+export HCM_BASE_URL=http://localhost:4001
+export DB_PATH=timeoff.sqlite
+export API_KEY=dev-secret
+export HCM_TIMEOUT_MS=3000
+
+npm run start:dev
+```
+
+Expected terminal output includes:
+```text
+Nest application successfully started
+```
+
+The API is now running at `http://localhost:3000`. Leave this terminal open while testing.
 
 ## Tests
 Run tests:
@@ -127,7 +168,13 @@ curl -X POST http://localhost:3000/balances/bootstrap \
 Production note: TypeORM auto-sync is disabled when `NODE_ENV=production`; use migrations for production database changes.
 
 ## Manual API Testing
-The following commands demonstrate the main product flow and the expected security behavior. Use these after the mock HCM and the NestJS service are both running.
+Run these commands in terminal 3 after terminal 1 and terminal 2 are both running. These commands demonstrate the main product flow and expected security behavior.
+
+Start from the project folder:
+
+```bash
+cd "/path/to/time-off-microservice"
+```
 
 ### 1. Verify Unauthorized Requests Are Blocked
 Call any protected endpoint without headers:

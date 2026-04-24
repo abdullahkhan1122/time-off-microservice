@@ -1,0 +1,38 @@
+{
+  "name": "job-application",
+  "version": "1.0.0",
+  "description": "Time-Off microservice take-home solution",
+  "main": "src/main.js",
+  "scripts": {
+    "build": "node scripts/check-syntax.js",
+    "start": "node src/main.js",
+    "start:dev": "node src/main.js",
+    "lint": "eslint \"{src,test,scripts}/**/*.js\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
+  },
+  "keywords": [],
+  "author": "Muhammad Abdullah",
+  "license": "ISC",
+  "dependencies": {
+    "@nestjs/common": "^11.1.19",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.1.19",
+    "@nestjs/platform-express": "^11.1.19",
+    "@nestjs/typeorm": "^11.0.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.28"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.1.19",
+    "eslint": "^10.2.1",
+    "jest": "^30.3.0",
+    "prettier": "^3.8.3",
+    "supertest": "^7.2.2"
+  }
+}
